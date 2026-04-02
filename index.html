@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrackForge | Workout Tracker Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-glow"></div>
+  <main class="app-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Workout Tracker Prototype</p>
+        <h1>TrackForge</h1>
+        <p class="hero-text">
+          Build detailed training blocks on desktop, then move through each session smoothly on iPhone.
+          The structure below mirrors your spreadsheet workflow and prepares us for long-term saved data.
+        </p>
+      </div>
+
+      <div class="hero-controls">
+        <label class="field">
+          <span>Active account</span>
+          <select id="user-select" aria-label="Choose active user"></select>
+        </label>
+
+        <label class="field">
+          <span>Workout template</span>
+          <select id="program-select" aria-label="Choose active workout template"></select>
+        </label>
+
+        <label class="field">
+          <span>Weight units</span>
+          <select id="weight-unit-select" aria-label="Choose weight units">
+            <option value="lb">Pounds (lb)</option>
+            <option value="kg">Kilograms (kg)</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Distance units</span>
+          <select id="distance-unit-select" aria-label="Choose distance units">
+            <option value="mi">Miles (mi)</option>
+            <option value="km">Kilometers (km)</option>
+          </select>
+        </label>
+
+        <button id="seed-workout-btn" class="primary-button" type="button">Start or resume today's workout</button>
+        <p class="section-note">Planned production version: passwordless email link sign-in and an invite-based shared read-only view.</p>
+      </div>
+    </header>
+
+    <nav class="view-switch" aria-label="Primary views">
+      <button class="view-tab is-active" data-view-target="overview-panel" type="button">Overview</button>
+      <button class="view-tab" data-view-target="builder-panel" type="button">Program Builder</button>
+      <button class="view-tab" data-view-target="calendar-panel" type="button">Calendar</button>
+      <button class="view-tab" data-view-target="mobile-panel" type="button">iPhone Flow</button>
+    </nav>
+
+    <section id="overview-panel" class="view-panel is-active">
+      <div id="metrics-grid" class="metrics-grid"></div>
+
+      <div class="overview-grid">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Progression Engine</p>
+              <h2>AI-style next session recommendations</h2>
+            </div>
+            <p class="section-note">First-pass progression logic based on top sets, rep targets, and average RPE.</p>
+          </div>
+
+          <div id="recommendations-list" class="recommendations-list"></div>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Recent Trend</p>
+              <h2>Training load over time</h2>
+            </div>
+            <p class="section-note">Volume and estimated strength changes from recent logged sessions.</p>
+          </div>
+
+          <div id="trend-bars" class="trend-bars"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="builder-panel" class="view-panel">
+      <div class="builder-grid">
+        <article class="panel-card builder-sidebar">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Desktop Setup</p>
+              <h2>Saved workouts</h2>
+            </div>
+          </div>
+
+          <div id="template-list" class="template-list"></div>
+          <button id="new-template-btn" class="ghost-button" type="button">Create new workout</button>
+        </article>
+
+        <article class="panel-card builder-editor">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Template Editor</p>
+              <h2 id="template-heading">Workout builder</h2>
+            </div>
+            <button id="duplicate-template-btn" class="ghost-button" type="button">Duplicate template</button>
+          </div>
+
+          <div class="builder-config">
+            <label class="field">
+              <span>Workout name</span>
+              <input id="template-name-input" type="text" placeholder="Upper Push A">
+            </label>
+
+            <label class="field">
+              <span>Training focus</span>
+              <input id="template-focus-input" type="text" placeholder="Push strength">
+            </label>
+
+            <label class="field">
+              <span>Logging mode</span>
+              <select id="template-log-mode-input">
+                <option value="set-by-set">Track every set</option>
+                <option value="workout-complete">Track at workout level</option>
+              </select>
+            </label>
+
+            <label class="field field-wide">
+              <span>Template notes</span>
+              <textarea id="template-notes-input" rows="3" placeholder="Coaching notes, movement cues, or warm-up instructions"></textarea>
+            </label>
+          </div>
+
+          <div class="composer-grid">
+            <form id="strength-form" class="mini-form">
+              <div class="section-head mini-head">
+                <div>
+                  <p class="eyebrow">Add Exercise</p>
+                  <h3>Strength block</h3>
+                </div>
+              </div>
+
+              <label class="field">
+                <span>Exercise name</span>
+                <input name="exerciseName" type="text" placeholder="Incline Barbell Bench" required>
+              </label>
+
+              <div class="inline-fields">
+                <label class="field">
+                  <span>Rep range</span>
+                  <input name="repRange" type="text" placeholder="6-8" required>
+                </label>
+
+                <label class="field">
+                  <span>Sets</span>
+                  <input name="setCount" type="number" min="1" max="8" value="4" required>
+                </label>
+              </div>
+
+              <div class="inline-fields">
+                <label class="field">
+                  <span>Starting weight</span>
+                  <input name="startWeight" type="number" min="0" step="0.5" value="135" required>
+                </label>
+
+                <label class="field">
+                  <span>Target reps</span>
+                  <input name="targetReps" type="number" min="1" step="0.5" value="8" required>
+                </label>
+
+                <label class="field">
+                  <span>Target RPE</span>
+                  <input name="targetRpe" type="number" min="1" max="10" step="0.5" value="7" required>
+                </label>
+              </div>
+
+              <div class="inline-fields">
+                <label class="field">
+                  <span>Movement tag</span>
+                  <select name="movementTag">
+                    <option value="upper-barbell">Upper body barbell</option>
+                    <option value="upper-dumbbell">Upper body dumbbell</option>
+                    <option value="lower-barbell">Lower body barbell</option>
+                    <option value="lower-dumbbell">Lower body dumbbell</option>
+                    <option value="machine">Machine or cable</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Progression style</span>
+                  <select name="progressionStyle">
+                    <option value="weight-first">Increase load first</option>
+                    <option value="rep-first">Increase reps first</option>
+                    <option value="hold">Hold until technique improves</option>
+                  </select>
+                </label>
+              </div>
+
+              <button class="primary-button" type="submit">Add strength block</button>
+            </form>
+
+            <form id="cardio-form" class="mini-form">
+              <div class="section-head mini-head">
+                <div>
+                  <p class="eyebrow">Add Cardio</p>
+                  <h3>Cardio block</h3>
+                </div>
+              </div>
+
+              <label class="field">
+                <span>Cardio name</span>
+                <input name="cardioName" type="text" placeholder="Row erg intervals" required>
+              </label>
+
+              <div class="inline-fields">
+                <label class="field">
+                  <span>Time (minutes)</span>
+                  <input name="targetTime" type="number" min="1" step="1" value="12" required>
+                </label>
+
+                <label class="field">
+                  <span>Distance</span>
+                  <input name="targetDistance" type="number" min="0" step="0.1" value="2.4" required>
+                </label>
+
+                <label class="field">
+                  <span>Difficulty</span>
+                  <input name="targetDifficulty" type="number" min="1" max="10" step="0.5" value="6" required>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Notes</span>
+                <textarea name="cardioNotes" rows="3" placeholder="Pace target, heart-rate target, or breathing constraint"></textarea>
+              </label>
+
+              <button class="primary-button secondary-tone" type="submit">Add cardio block</button>
+            </form>
+          </div>
+
+          <div id="exercise-builder" class="exercise-stack"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="calendar-panel" class="view-panel">
+      <div class="calendar-grid">
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Calendar View</p>
+              <h2 id="calendar-heading">Training month</h2>
+            </div>
+
+            <div class="calendar-nav">
+              <button id="calendar-prev-btn" class="ghost-button" type="button">Previous</button>
+              <button id="calendar-next-btn" class="ghost-button" type="button">Next</button>
+            </div>
+          </div>
+
+          <div class="calendar-weekdays">
+            <span>Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+          </div>
+
+          <div id="calendar-days" class="calendar-days"></div>
+        </article>
+
+        <article class="panel-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Session Detail</p>
+              <h2 id="selected-date-label">Selected date</h2>
+            </div>
+            <p class="section-note">Click any training day to review the logged workout name, set data, volume, and cardio summary.</p>
+          </div>
+
+          <div id="selected-day-content" class="selected-day-content"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="mobile-panel" class="view-panel">
+      <div class="mobile-layout">
+        <article class="phone-shell">
+          <div class="phone-header">
+            <p class="eyebrow">Simple iPhone Flow</p>
+            <h2 id="mobile-workout-name">Choose a workout and log it</h2>
+            <p id="mobile-workout-summary" class="section-note">Track set by set or mark each block complete, depending on the template.</p>
+          </div>
+
+          <div class="phone-progress">
+            <div class="progress-track">
+              <span id="mobile-progress-bar"></span>
+            </div>
+            <p id="mobile-step-label" class="section-note">No active session yet.</p>
+          </div>
+
+          <div id="mobile-step-card" class="mobile-step-card"></div>
+
+          <div class="phone-actions">
+            <button id="mobile-prev-btn" class="ghost-button" type="button">Previous</button>
+            <button id="mobile-log-btn" class="primary-button" type="button">Log current step</button>
+            <button id="mobile-next-btn" class="ghost-button" type="button">Next</button>
+          </div>
+        </article>
+
+        <article class="panel-card mobile-sidecar">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Phone Companion</p>
+              <h2>What stays on the simple side</h2>
+            </div>
+          </div>
+
+          <ul class="simple-list">
+            <li>Sign in and choose a workout already built on desktop.</li>
+            <li>Move from block to block without seeing the full programming complexity.</li>
+            <li>Keep a quick past-session calendar and a compact progress trail.</li>
+          </ul>
+
+          <div class="mobile-history-head">
+            <h3>Recent sessions</h3>
+            <p class="section-note">A compact history feed for fast check-ins between workouts.</p>
+          </div>
+          <div id="session-history-list" class="session-history-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      Prototype goal: lock the workflow and data model first, then wire the same screens to a real hosted backend so you and your friend keep separate long-term training histories.
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
